@@ -1,5 +1,6 @@
 const UserSchema = require('../Schemas/UserSchema')
 
+const bcrypt = require('bcrypt')
 
 
 exports.bhanu = (req,res) =>{
@@ -19,6 +20,8 @@ exports.resgiter= (req,res)=>{
     <form method="GET" action="/user/message"   >
     <input placeholder="Enter your name" name="name"  />
     <input placeholder="Enter your email"  name="email"  />
+    <input placeholder="Enter your email"  name="mobile"  />
+    <input placeholder="Enter your password"  name="password"  />
     <button>Submit</button>
     </form>
     `)
@@ -27,16 +30,57 @@ exports.resgiter= (req,res)=>{
 
 exports.message = (req,res)=>{
 
-    const {name , email} =  req.query
+        bcrypt.genSalt(10 ,  function(err ,salt ){
+            if(err)
+            {
+                res.send("Something went wrong")
+            }
+            else
+            {
+                        bcrypt.hash( req.query.password , salt , function(err ,  hash){
+                            if(err)
+                            {
+                                res.send("Something went wrong")
+                            }
+                            else
+                            {
+                                const {name , email , mobile } =  req.query
 
-    UserSchema.insertMany({name : name ,  email : email}).then((result)=>{
-        console.log(result)
-        res.send("USer Created")
+                                UserSchema.insertMany({name : name ,  email : email , mobile:  mobile , password : hash}).then((result)=>{
+                                    console.log(result)
+                                    res.send("USer Created")
+                            
+                                }).catch((err)=>{
+                            
+                                    console.log(err.name)
+                                    console.log(err.code)
+                                    console.log(err.message)
+                                    console.log(err.errors)
+                                    
+                                    if(err.name == "ValidationError")
+                                    {
+                                            res.send(`${err.message.split(":")[1]} is Required`)
+                            
+                                    }
+                                    else if(err.code == 11000 && err.name == 'MongoBulkWriteError'){
+                                        res.send(`${err.message.split("{")[1].replace("}" , "").split(':')[1]} alreday exits in database`)
+                                    }
+                                     else{
+                                         res.send('Something Went Wrong')
+                            
+                                        }
+                                })
+                            
+                            }
 
-    }).catch((err)=>{
-        console.log(err)
-        res.send('Something Went Wrong')
-    })
 
+
+                        })
+            }
+        })
+
+
+
+    
 
 }
