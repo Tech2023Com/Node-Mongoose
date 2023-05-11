@@ -34,7 +34,7 @@ exports.message = (req,res)=>{
             if(err)
             {
                 console.log(err)
-                res.send("Something went wrong")
+                res.status(500).send({status :  500 , message : "Something went wrong"})
             }
             else
             {
@@ -42,7 +42,7 @@ exports.message = (req,res)=>{
                     if(err)
                     {
                                 console.log(err)
-                                res.send("Something went wrong")
+                                res.status(500).send({ status : 500 , message :   "Something went wrong"})
                             }
                             else
                             {
@@ -50,10 +50,10 @@ exports.message = (req,res)=>{
 
                                 UserSchema.insertMany({name : name ,  email : email , mobile:  mobile , password : hash}).then((result)=>{
                                     console.log(result)
-                                    res.send("USer Created")
+                                    res.status(200).send({status :  200 ,  message : "User Created Successfully !!"})
                             
                                 }).catch((err)=>{
-                                    conosole.log(err)
+                                    console.log(err)
                             
                                     console.log(err.name)
                                     console.log(err.code)
@@ -62,14 +62,14 @@ exports.message = (req,res)=>{
                                     
                                     if(err.name == "ValidationError")
                                     {
-                                            res.send(`${err.message.split(":")[1]} is Required`)
+                                            res.status(400).send( {status : 400, message : `${err.message.split(":")[1]} is Required`})
                             
                                     }
                                     else if(err.code == 11000 && err.name == 'MongoBulkWriteError'){
-                                        res.send(`${err.message.split("{")[1].replace("}" , "").split(':')[1]} alreday exits in database`)
+                                        res.status(400).send({status : 400, message :  `${err.message.split("{")[1].replace("}" , "").split(':')[1]} alreday exits in database` } )
                                     }
                                      else{
-                                         res.send('Something Went Wrong')
+                                         res.status(400).send({status : 400  , message : "Something Went Wrong ):"})
                             
                                         }
                                 })
@@ -103,20 +103,20 @@ exports.login= (req,res)=>{
             bcrypt.compare(password , result[0].password , function(err,status){
                 if(err)
                 {
-                    res.send("Something Went Wrong")
+                    res.status(500).send({ status :  500 ,  messgae:  "Something Went Wrong"})
                 }
                 else
                 {
                     if(status == true)
                     {
-                        var {name , email , mobile} =  result[0]
+                        var {name , email , mobile , _id} =  result[0]
                          
 
-                        res.send({message : "User Login Succesfull" , data : [{name : name , email : email, mobile : mobile}]})
+                        res.status(200).send({ status: 200, message : "User Login Succesfull" , data : [{  id : _id ,  name : name , email : email, mobile : mobile}]})
                     }
                     else
                     {
-                        res.send({message : "Incorrect Password" , data : []})
+                        res.status(400).send({ status : 200 , message : "Incorrect Password" , data : []})
 
                     }
                 }
@@ -125,7 +125,7 @@ exports.login= (req,res)=>{
         }
         else
         {
-            res.send('User Not Found')
+            res.status(400).send(  {status : 200 , message :  'User Not Found'})
 
         }
 
@@ -134,7 +134,7 @@ exports.login= (req,res)=>{
 
         console.log(err)
 
-        res.send(err)
+        res.status(400).send({status : 400 , message  : "Something Went Wrong"})
 
     })
 

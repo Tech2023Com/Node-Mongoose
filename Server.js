@@ -5,7 +5,9 @@ const UserRoutes = require('./Routes/UserRoutes')
 const AdminRoutes =  require('./Routes/AdminRoutes')
 const db = require('./DB/db')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended : true}))
 
