@@ -109,10 +109,10 @@ exports.login= (req,res)=>{
                 {
                     if(status == true)
                     {
-                        var temp = result[0]
-                        delete temp['password']
+                        var {name , email , mobile} =  result[0]
+                         
 
-                        res.send({message : "User Login Succesfull" , data : temp})
+                        res.send({message : "User Login Succesfull" , data : [{name : name , email : email, mobile : mobile}]})
                     }
                     else
                     {
