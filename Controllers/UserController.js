@@ -33,24 +33,27 @@ exports.message = (req,res)=>{
         bcrypt.genSalt(10 ,  function(err ,salt ){
             if(err)
             {
+                console.log(err)
                 res.send("Something went wrong")
             }
             else
             {
-                        bcrypt.hash( req.query.password , salt , function(err ,  hash){
-                            if(err)
-                            {
+                bcrypt.hash( req.body.password , salt , function(err ,  hash){
+                    if(err)
+                    {
+                                console.log(err)
                                 res.send("Something went wrong")
                             }
                             else
                             {
-                                const {name , email , mobile } =  req.query
+                                const {name , email , mobile } =  req.body
 
                                 UserSchema.insertMany({name : name ,  email : email , mobile:  mobile , password : hash}).then((result)=>{
                                     console.log(result)
                                     res.send("USer Created")
                             
                                 }).catch((err)=>{
+                                    conosole.log(err)
                             
                                     console.log(err.name)
                                     console.log(err.code)
@@ -82,5 +85,59 @@ exports.message = (req,res)=>{
 
 
     
+
+}
+
+
+
+exports.login= (req,res)=>{
+
+    const {email , password} =  req.body
+
+
+    UserSchema.find({email : email}).then((result)=>{
+
+        console.log(result)
+        if(result.length > 0)
+        {
+            bcrypt.compare(password , result[0].password , function(err,status){
+                if(err)
+                {
+                    res.send("Something Went Wrong")
+                }
+                else
+                {
+                    if(status == true)
+                    {
+                        var temp = result[0]
+                        delete temp['password']
+
+                        res.send({message : "User Login Succesfull" , data : temp})
+                    }
+                    else
+                    {
+                        res.send({message : "Incorrect Password" , data : []})
+
+                    }
+                }
+            }  )
+            
+        }
+        else
+        {
+            res.send('User Not Found')
+
+        }
+
+
+    }).catch((err)=>{
+
+        console.log(err)
+
+        res.send(err)
+
+    })
+
+
 
 }
