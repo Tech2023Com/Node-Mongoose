@@ -141,3 +141,60 @@ exports.login= (req,res)=>{
 
 
 }
+
+
+exports.getAllUsers = (req,res) =>{
+
+
+    UserSchema.find({}).then((result)=>{
+        res.status(200).send(result)
+    }).catch((err)=>{
+        res.status(400).send({status : 400 , message : "Something Went Wrong"})
+    })
+
+}
+
+
+exports.editUser = (req,res) =>{
+
+   const { id , name ,email , mobile} =  req.body 
+ 
+
+UserSchema.updateOne({_id : id} , {  $set :  {  name : name ,  email : email , mobile : mobile } }).then((result)=>{
+    console.log(result)
+    if(result.modifiedCount != 0)
+    {
+        res.status(200).send({status : 200 , message : "Updated Successfully"})
+    }
+    else
+    {
+        res.status(400).send({status : 400 , message : "Not Updated"})
+
+    }
+    // res.send("hi")
+}).catch((err)=>{
+    res.status(400).send({status : 400 , message : "Something Went Wrong"})
+
+})
+
+}
+
+exports.deleteUser = (req,res) =>{
+    UserSchema.deleteOne({_id : req.query.id}).then((result)=>{
+        console.log(result)
+        if(result.deletedCount == 1)
+        {
+
+            res.status(200).send({status : 200 ,  message : "User Deleted Successfully"})
+        }
+        else
+        {
+            res.status(400).send({status : 400 ,  message : "User  Not Deleted"})
+
+        }
+    }).catch((err)=>{
+        console.log(err)
+        res.status(400).send({status : 400 ,  message : "Something Went Wrong"})
+
+    })
+}
